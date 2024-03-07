@@ -172,7 +172,7 @@ void Board::ConfigureByFen(const size_t index)
             continue;
         }
 
-        if (Utility::IsNumber(pieces[i]))
+        if (Utility::IsCharNumber(pieces[i]))
         {
             for (int x = 0; x < Utility::CharToNumber(pieces[i]); x++)
             {

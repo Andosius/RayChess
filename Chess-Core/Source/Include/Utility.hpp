@@ -38,24 +38,24 @@ namespace Utility
 		return idx;
 	}
 
-	bool IsNumber(char piece)
+	inline bool IsCharNumber(char piece)
 	{
 		return piece >= 48 && piece <= 57;
 	}
 
-	int CharToNumber(char piece)
+	inline int CharToNumber(char piece)
 	{
 		return (int)(piece - 48);
 	}
 
-	std::string FenToPieceMap(const std::string& fen)
+	inline std::string FenToPieceMapString(const std::string& fen)
 	{
 		std::string result;
 
 		int i = 0;
 		while (fen[i] != ' ')
 		{
-			if (!IsNumber(fen[i]) && fen[i] != '/')
+			if (!IsCharNumber(fen[i]) && fen[i] != '/')
 			{
 				result += std::to_string(fen[i]);
 			}
@@ -73,7 +73,7 @@ namespace Utility
 		return result;
 	}
 
-	ChessColor GetPieceTeam(char piece)
+	inline ChessColor GetPiecesTeam(char piece)
 	{
 		if (piece >= 97 && piece <= 122)
 		{
@@ -82,7 +82,7 @@ namespace Utility
 		return ChessColor::White;
 	}
 
-	bool IsSameTeam(char pieceA, char pieceB)
+	inline bool IsSameTeam(char pieceA, char pieceB)
 	{
 		// Same "team"
 		// A-Z => 65-90 | a-z => 97-122

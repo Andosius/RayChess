@@ -26,6 +26,12 @@ struct Vec2
 	{
 	}
 
+	Vec2(int n)
+	{
+		X = n % 8;
+		Y = n / 8;
+	}
+
 	void TurnAround()
 	{
 		Y *= -1;
@@ -56,7 +62,7 @@ struct Vec2
 		return result;
 	}
 
-	Vec2 operator*(int multiplier)
+	Vec2 operator*(int multiplier) const
 	{
 		Vec2 result = *this;
 		result.X *= multiplier;
