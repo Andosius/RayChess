@@ -13,6 +13,7 @@ namespace fs = std::filesystem;
 
 
 std::array<Texture, 12> g_Textures = std::array<Texture, 12>();
+std::array<Image, 12> g_Images = std::array<Image, 12>();
 
 
 namespace Textures

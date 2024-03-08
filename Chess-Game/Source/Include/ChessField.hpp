@@ -15,9 +15,11 @@
 
 struct ChessField
 {
-    ChessField() = default;
+    ChessField();
     ChessField(Color color, char piece);
 
     Color FieldColor;
     char Piece;
+
+    bool Selected = false;
 };

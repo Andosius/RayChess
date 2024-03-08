@@ -11,12 +11,15 @@
 
 //======================================
 
+#define RENDER_THROUGH_TEXTURE
 
 Chess::Chess()
     : m_GameState(DEFAULT_FEN)
 {
     InitWindow(FIELD_WIDTH * 8, FIELD_WIDTH * 8, "Chess Board");
     SetTargetFPS(20);
+
+    Textures::LoadChessPieces();
 
     {
         m_BoardTexture = Texture2D{};
@@ -35,6 +38,7 @@ Chess::Chess()
 Chess::~Chess()
 {
     UnloadTexture(m_BoardTexture);
+    Textures::UnloadChessPieces();
 }
 
 void Chess::GameStateToBoard()
@@ -72,7 +76,8 @@ void Chess::GenerateBoardTexture()
             int column = i % 8;
             int row = i / 8;
 
-            for (int y = row * FIELD_WIDTH; y < (row + 1) * FIELD_WIDTH; y++)
+            // Draw fields
+            for (int y = row * FIELD_HEIGHT; y < (row + 1) * FIELD_HEIGHT; y++)
             {
                 for (int x = column * FIELD_WIDTH; x < (column + 1) * FIELD_WIDTH; x++)
                 {

@@ -11,6 +11,7 @@
 
 // Standard Library
 #include <array>
+#include <vector>
 
 //======================================
 
@@ -40,4 +41,6 @@ private:
     Color m_ColorSelected;
     Color m_ColorMove;
     Color m_ColorLastMove;
+
+    std::vector<Vec2> m_SelectedPositions;
 };

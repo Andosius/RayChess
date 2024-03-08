@@ -21,7 +21,7 @@ project "Game"
     include_raylib()
     link_raylib()
 
-    postbuildcommands { "{COPYDIR} %[../Assets] %[%{!cfg.targetdir}]" }
+    postbuildcommands { "{COPYDIR} %[../Resources/] %[%{!cfg.targetdir}]" }
 
     -- Project settings
     filter {"action:vs*", "configurations:Release"}
@@ -37,6 +37,7 @@ project "Game"
     vpaths
     {
         ["Entrypoint"] = { "Source/Application.cpp", "Source/Include/Application.hpp", "Source/main.cpp" },
-        ["Game-Rendering"] = { "Source/Chess.cpp", "Source/Include/Chess.hpp", "Source/Textures.cpp", "Source/Include/Textures.hpp", "Source/GameState.cpp", "Source/Include/GameState.hpp", "Source/ChessField.cpp", "Source/Include/ChessField.hpp", "Source/Include/ChessColor.hpp" },
+        ["Game/Rendering"] = { "Source/Chess.cpp", "Source/Include/Chess.hpp", "Source/Textures.cpp", "Source/Include/Textures.hpp" },
+        ["Game/Logic"] = { "Source/GameState.cpp", "Source/Include/GameState.hpp", "Source/ChessField.cpp", "Source/Include/ChessField.hpp", "Source/Include/ChessColor.hpp", "Source/Include/ChessPiece.hpp" },
         ["Utility"] = { "Source/Utility.cpp", "Source/Include/Utility.hpp", "Source/Include/Constants.hpp", "Source/Include/Vector2.hpp" }
     }
