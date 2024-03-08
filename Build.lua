@@ -1,6 +1,6 @@
 workspace "Chess"
     location "build"
-    startproject "Core"
+    startproject "Game"
 
     configurations { "Debug", "Release"}
     platforms { "x64", "x86", "ARM64"}
@@ -25,4 +25,4 @@ workspace "Chess"
 
 
 include "Dependencies.lua"
-include "Chess-Core/Build-Core.lua"
+include "Chess-Game/Build-Game.lua"
