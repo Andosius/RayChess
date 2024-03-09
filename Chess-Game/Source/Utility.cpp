@@ -1,5 +1,6 @@
 // Local dependencies
 #include "Utility.hpp"
+#include "Constants.hpp"
 
 // External dependencies
 
@@ -15,11 +16,11 @@ namespace Utility
 {
     bool IsCharNumber(char data)
     {
-        return data >= 48 && data <= 57;
+        return data >= CHAR_NUM_START && data <= CHAR_NUM_END;
     }
 
     int ConvertCharToNumber(char data)
     {
-        return static_cast<int>(data - 48);
+        return static_cast<int>(data - CHAR_TO_NUM_DIFF);
     }
 }

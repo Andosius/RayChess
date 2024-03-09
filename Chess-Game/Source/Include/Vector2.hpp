@@ -8,7 +8,7 @@
 
 
 // Standard Library
-#include <array>
+
 
 //======================================
 
@@ -33,11 +33,6 @@ struct Vec2
         Y = n / 8;
     }
 
-    void TurnAround()
-    {
-        Y *= -1;
-    }
-
     ~Vec2() = default;
 
     bool IsValidPosition() const
@@ -45,26 +40,31 @@ struct Vec2
         return X >= 0 && X < 8 && Y >= 0 && Y < 8;
     }
 
-    bool operator==(const Vec2 other) const
+    int ToInt(int base = 8) const
     {
-        return (X == other.X) && (Y == other.Y);
+        return Y * base + X;
     }
 
-    bool operator!=(const Vec2 other) const
-    {
-        return (X != other.X) || (Y != other.Y);
-    }
-
-    Vec2 operator+(const Vec2 other)
+    Vec2 operator+(const Vec2 other) const
     {
         Vec2 result;
-        result.X = X + other.X;
-        result.Y = Y + other.Y;
+
+        result.X = other.X + X;
+        result.Y = other.Y + Y ;
+
+        return result;
+    }
+    
+    Vec2 operator*(const Vec2 multiplier) const
+    {
+        Vec2 result = *this;
+        result.X *= multiplier.X;
+        result.Y *= multiplier.Y;
 
         return result;
     }
 
-    Vec2 operator*(int multiplier) const
+    Vec2 operator*(const int multiplier) const
     {
         Vec2 result = *this;
         result.X *= multiplier;
@@ -73,16 +73,8 @@ struct Vec2
         return result;
     }
 
-    void operator<<(int n)
+    bool operator==(const Vec2 data) const
     {
-        int count = (int)(*this) + n;
-
-        X = count % 8;
-        Y = count / 8;
-    }
-
-    operator int() const
-    {
-        return Y * 8 + X;
+        return data.X == X && data.Y == Y;
     }
 };

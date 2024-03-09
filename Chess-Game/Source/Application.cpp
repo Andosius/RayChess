@@ -19,6 +19,7 @@ namespace Application
 
         while (!WindowShouldClose())
         {
+            game.HandleInput();
             game.DrawChessBoard();
         }
     }

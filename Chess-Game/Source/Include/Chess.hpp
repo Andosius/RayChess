@@ -29,11 +29,16 @@ public:
     void GenerateBoardTexture();
 
     void DrawChessBoard();
+    void HandleInput();
 
 private:
-    GameState m_GameState;
-    std::array<ChessField, 64> m_Board;
+    bool IsPiecesTurn(char piece);
 
+public:
+    GameState State;
+    std::array<ChessField, 64> Board;
+
+private:
     Texture2D m_BoardTexture;
 
     Color m_ColorBlack;
@@ -41,6 +46,9 @@ private:
     Color m_ColorSelected;
     Color m_ColorMove;
     Color m_ColorLastMove;
+    Color m_ColorMarked;
 
-    std::vector<Vec2> m_SelectedPositions;
+    int m_TargetPiece;
+    std::vector<int> m_SelectedPositions;
+    std::vector<int> m_PossibleMoves;
 };

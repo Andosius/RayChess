@@ -2,7 +2,7 @@
 
 
 // Local dependencies
-#include "ChessColor.hpp"
+#include "ChessTeam.hpp"
 #include "Vector2.hpp"
 
 // External dependencies
@@ -19,15 +19,17 @@ struct GameState
     GameState() = delete;
     GameState(const std::string& fen);
 
+    std::string Export();
+
 
     std::string FenPieceMap = "";
 
-    ChessColor Turn = ChessColor::White;
+    ChessTeam Turn = ChessTeam::White;
 
-    bool WhiteCastlingQueen = false;
     bool WhiteCastlingKing = false;
-    bool BlackCastlingQueen = false;
+    bool WhiteCastlingQueen = false;
     bool BlackCastlingKing = false;
+    bool BlackCastlingQueen = false;
 
     Vec2 EnPassant = Vec2(-1, -1);
 

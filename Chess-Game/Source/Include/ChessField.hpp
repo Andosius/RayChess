@@ -20,6 +20,4 @@ struct ChessField
 
     Color FieldColor;
     char Piece;
-
-    bool Selected = false;
 };
