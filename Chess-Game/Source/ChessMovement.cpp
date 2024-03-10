@@ -226,13 +226,21 @@ namespace Move
         }
     }
 
-    static void EliminateSelfCheckPositions(std::vector<int>& moves, const std::array<ChessField, 64>& board, const MoveInformation& info)
+    static void EliminateSelfCheckPositions(std::vector<int>& ally_moves, const std::array<ChessField, 64>& board, const MoveInformation& info)
     {
         std::set<int> remove_moves = std::set<int>();
+        int enemy_king_idx = GetTeamKing(board, GetEnemyTeam(info.Team));
 
         // Create a board for every move and simulate it
-        for (const int move_location : moves)
+        for (const int move_location : ally_moves)
         {
+            // Prevent capturing enemy king
+            if (move_location == enemy_king_idx)
+            {
+                remove_moves.insert(move_location);
+                continue;
+            }
+
             // Copy the board
             std::array<ChessField, 64> boardCopy = board;
 
@@ -269,7 +277,7 @@ namespace Move
 
         for (int to_remove : remove_moves)
         {
-            std::remove(moves.begin(), moves.end(), to_remove);
+            std::remove(ally_moves.begin(), ally_moves.end(), to_remove);
         }
     }
 
