@@ -214,55 +214,43 @@ namespace Move
 
     static void EliminateCheckPositions(std::vector<int>& moves, const std::array<ChessField, 64>& board, const MoveInformation& info)
     {
-
+        // Current position
         int from_idx = info.Position.ToInt();
+        // Clicked piece team king
         int king_idx = GetTeamKing(board, info.Team);
-
-        std::set<int> to_erase = std::set<int>();
         
-        for (int i = 0; i < moves.size(); i++)
-        {
-            // If moves[i] is king position, we add it and continue
-            if (moves[i] == king_idx)
-            {
-                to_erase.insert(i);
-                continue;
-            }
 
-            
+        for (std::vector<int>::iterator it = moves.begin(); it != moves.end(); it++)
+        {
+            // Create a copy of board and replace old position
             std::array<ChessField, 64> board_copy = board;
 
-            board_copy[moves[i]].Piece = board_copy[from_idx].Piece;
+            board_copy[*it].Piece = board_copy[from_idx].Piece;
             board_copy[from_idx].Piece = ' ';
-            
-            bool breakOut = false;
-            for (int p = 0; p < board_copy.size(); p++)
+
+
+            // Get all enemy positions, preallocate 128 moves to be sure it fits - you never know
+            std::vector<int> enemy_moves = std::vector<int>(128);
+
+            for (int i = 0; i < board_copy.size(); i++)
             {
-                if (breakOut)
-                {
-                    break;
-                }
+                const ChessField field = board_copy[i];
 
-                if (Helpers::IsChessPiece(board_copy[p].Piece) && !Helpers::IsSameTeam(board_copy[p].Piece, info.Team))
+                if (Helpers::IsChessPiece(field.Piece) && !Helpers::IsSameTeam(field.Piece, info.Team))
                 {
-                    std::vector<int> piece_moves = GetMovementPositions(board_copy, p, false);
-
-                    for (int move_idx : piece_moves)
-                    {
-                        if (move_idx == king_idx)
-                        {
-                            to_erase.insert(i);
-                            breakOut = true;
-                            break;
-                        }
-                    }
+                    std::vector<int> temp = Move::GetMovementPositions(board_copy, i, false);
+                    enemy_moves.insert(enemy_moves.end(), temp.begin(), temp.end());
                 }
             }
-        }
 
-        for (int delete_idx : to_erase)
-        {
-            moves.erase(moves.begin() + delete_idx);
+            for (const int emove : enemy_moves)
+            {
+                if (emove == king_idx)
+                {
+                    moves.erase(it);
+                    break;
+                }
+            }
         }
     }
 
