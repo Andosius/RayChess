@@ -11,6 +11,7 @@
 
 // Standard Library
 #include <string>
+#include <set>
 
 //======================================
 
@@ -40,16 +41,6 @@ namespace Move
             });
 
         return (int)std::distance(board.begin(), it);
-    }
-
-    static bool IsValidKingPosition(int index)
-    {
-        if (index != -1)
-        {
-            return true;
-        }
-
-        return false;
     }
 
     static ChessTeam GetEnemyTeam(ChessTeam team)
@@ -237,57 +228,48 @@ namespace Move
 
     static void EliminateSelfCheckPositions(std::vector<int>& moves, const std::array<ChessField, 64>& board, const MoveInformation& info)
     {
+        std::set<int> remove_moves = std::set<int>();
 
-        // Current position
-        int from_idx = info.Position.ToInt();
-        int king_idx = GetTeamKing(board, info.Team);
-        int enemy_king_idx = GetTeamKing(board, GetEnemyTeam(info.Team));
-
-        for (std::vector<int>::iterator it = moves.begin(); it != moves.end();)
+        // Create a board for every move and simulate it
+        for (const int move_location : moves)
         {
-            // Remove enemy king position
-            // TODO Move to new function!!!!!!!!
-            if (*it == enemy_king_idx)
+            // Copy the board
+            std::array<ChessField, 64> boardCopy = board;
+
+            // Replace data - simulate move
+            boardCopy[move_location].Piece = boardCopy[info.Position.ToInt()].Piece; // old location is new location
+            boardCopy[info.Position.ToInt()].Piece = ' '; // old location is empty
+
+            // Get our own king so we can prevent moves that would expose him to an enemy
+            int king_idx = GetTeamKing(board, info.Team);
+
+            // Collect all enemy moves
+            std::set<int> enemy_moves = std::set<int>();
+
+            // for every board field (0 - 63), collect moves and add them to enemy_moves
+            for (int enemy_idx = 0; enemy_idx < boardCopy.size(); enemy_idx++)
             {
-                it = moves.erase(it);
-                continue;
-            }
-
-            // Create a copy of board and replace old position
-            std::array<ChessField, 64> board_copy = board;
-
-            board_copy[*it].Piece = board_copy[from_idx].Piece;
-            board_copy[from_idx].Piece = ' ';
-
-            // Get all enemy positions, preallocate 128 moves to make sure we stay performant
-            std::vector<int> enemy_moves = std::vector<int>(128);
-
-            for (int i = 0; i < board_copy.size(); i++)
-            {
-                const ChessField field = board_copy[i];
-
+                ChessField& field = boardCopy[enemy_idx];
                 if (Helpers::IsChessPiece(field.Piece) && !Helpers::IsSameTeam(field.Piece, info.Team))
                 {
-                    std::vector<int> temp = Move::GetMovementPositions(board_copy, i, false);
-                    enemy_moves.insert(enemy_moves.end(), temp.begin(), temp.end());
+                    std::vector<int> tmp_enemy_moves = Move::GetMovementPositions(boardCopy, enemy_idx, false);
+                    enemy_moves.insert(std::make_move_iterator(tmp_enemy_moves.begin()), std::make_move_iterator(tmp_enemy_moves.end()));
                 }
             }
 
-            bool continueNoIncrement = false;
-            for (const int enemy_move : enemy_moves)
-            {
-                if (enemy_move == king_idx)
-                {
-                    it = moves.erase(it);
-                    continueNoIncrement = true;
-                    break;
-                }
-            }
+            // Remove every move where: enemy_pos can be king_idx
+            std::set<int>::iterator it = std::find(enemy_moves.begin(), enemy_moves.end(), king_idx);
 
-            if (!continueNoIncrement)
+            // Enemy could attack King - invalidate move
+            if (it != enemy_moves.end())
             {
-                it++;
+                remove_moves.insert(move_location);
             }
+        }
+
+        for (int to_remove : remove_moves)
+        {
+            std::remove(moves.begin(), moves.end(), to_remove);
         }
     }
 
