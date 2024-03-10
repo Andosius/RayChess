@@ -241,7 +241,7 @@ namespace Move
             boardCopy[info.Position.ToInt()].Piece = ' '; // old location is empty
 
             // Get our own king so we can prevent moves that would expose him to an enemy
-            int king_idx = GetTeamKing(board, info.Team);
+            int king_idx = GetTeamKing(boardCopy, info.Team);
 
             // Collect all enemy moves
             std::set<int> enemy_moves = std::set<int>();
