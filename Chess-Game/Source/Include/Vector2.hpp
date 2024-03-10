@@ -35,16 +35,30 @@ struct Vec2
 
     ~Vec2() = default;
 
+    /// <summary>
+    /// Checks for valid chess board positions.
+    /// </summary>
+    /// <returns>True if X and Y are >= 0 and < 8</returns>
     bool IsValidPosition() const
     {
         return X >= 0 && X < 8 && Y >= 0 && Y < 8;
     }
 
+    /// <summary>
+    /// Converts Vec2 to integer index with default base 8.
+    /// </summary>
+    /// <param name="base">The base to multiply Y with</param>
+    /// <returns>int The index</returns>
     int ToInt(int base = 8) const
     {
         return Y * base + X;
     }
 
+    /// <summary>
+    /// Adds two Vec2 together.
+    /// </summary>
+    /// <param name="other">The other Vec2 we want to add to a result</param>
+    /// <returns>Vec2 The result</returns>
     Vec2 operator+(const Vec2 other) const
     {
         Vec2 result;
@@ -54,7 +68,13 @@ struct Vec2
 
         return result;
     }
-    
+
+    /// <summary>
+    /// Multiplies the values of the original vector with the multiplier Vec2.
+    /// Useful for directions like `Vec2(0, 1)` for going down.
+    /// </summary>
+    /// <param name="multiplier">Contains values for X and Y multiplication.</param>
+    /// <returns>Vec2 The result</returns>
     Vec2 operator*(const Vec2 multiplier) const
     {
         Vec2 result = *this;
@@ -64,6 +84,11 @@ struct Vec2
         return result;
     }
 
+    /// <summary>
+    /// Multiplies the value of X and Y by multiplier.
+    /// </summary>
+    /// <param name="multiplier">The integer to multiply against</param>
+    /// <returns>Vec2 The result</returns>
     Vec2 operator*(const int multiplier) const
     {
         Vec2 result = *this;
@@ -73,6 +98,11 @@ struct Vec2
         return result;
     }
 
+    /// <summary>
+    /// Compares two Vec2.
+    /// </summary>
+    /// <param name="data">The Vec2 we compare against</param>
+    /// <returns>True if X and Y are the same</returns>
     bool operator==(const Vec2 data) const
     {
         return data.X == X && data.Y == Y;

@@ -15,5 +15,8 @@
 
 namespace Application
 {
+    /// <summary>
+    /// Gets called from main.cpp to setup the application in a "clean" way.
+    /// </summary>
     void Run();
 }
