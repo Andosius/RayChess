@@ -25,14 +25,18 @@ public:
     Chess(const Chess&) = delete;
     Chess(Chess&&) = delete;
 
-    void GameStateToBoard();
-    void GenerateBoardTexture();
-
     void DrawChessBoard();
     void HandleInput();
 
 private:
-    bool IsPiecesTurn(char piece);
+    void GameStateToBoard();
+    void GenerateBoardTexture();
+
+    void OnPlayerLeftClickBoard(Vec2 position, bool isChessPiece);
+    void OnPlayerReleaseLeftClickBoard(Vec2 position, bool isPossibleMove);
+    void OnPlayerRightClickBoard(Vec2 position);
+
+    void OnMoveHappened(Vec2 from, Vec2 to);
 
 public:
     GameState State;
@@ -47,6 +51,8 @@ private:
     Color m_ColorMove;
     Color m_ColorLastMove;
     Color m_ColorMarked;
+
+    bool m_IsMoving;
 
     int m_TargetPiece;
     std::vector<int> m_SelectedPositions;

@@ -11,8 +11,6 @@
 
 // Standard Library
 #include <string>
-#include <set>
-#include <chrono>
 
 //======================================
 
@@ -42,6 +40,28 @@ namespace Move
             });
 
         return (int)std::distance(board.begin(), it);
+    }
+
+    static bool IsValidKingPosition(int index)
+    {
+        if (index != -1)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    static ChessTeam GetEnemyTeam(ChessTeam team)
+    {
+        if (team == ChessTeam::Black)
+        {
+            return ChessTeam::White;
+        }
+        else
+        {
+            return ChessTeam::Black;
+        }
     }
 
     static void GetContinuousPositions(std::vector<int>& moves, const std::array<ChessField, 64>& board, const MoveInformation& info, const Vec2 direction)
@@ -104,9 +124,12 @@ namespace Move
             }
         }
 
-        for (const Vec2 take : positions_move)
+        bool canMoveTwo = (info.Team == ChessTeam::Black && info.Position.Y == 1) || (info.Team == ChessTeam::White && info.Position.Y == 6);
+        for (int i = 0; i < (canMoveTwo ? 2 : 1); i++)
         {
-            Vec2 test_pos = info.Position + (take * direction);
+            Vec2 move = positions_move[i];
+
+            Vec2 test_pos = info.Position + (move * direction);
             int test_idx = test_pos.ToInt();
 
             if (test_pos.IsValidPosition())
@@ -212,24 +235,31 @@ namespace Move
         }
     }
 
-    static void EliminateCheckPositions(std::vector<int>& moves, const std::array<ChessField, 64>& board, const MoveInformation& info)
+    static void EliminateSelfCheckPositions(std::vector<int>& moves, const std::array<ChessField, 64>& board, const MoveInformation& info)
     {
+
         // Current position
         int from_idx = info.Position.ToInt();
-        // Clicked piece team king
         int king_idx = GetTeamKing(board, info.Team);
-        
+        int enemy_king_idx = GetTeamKing(board, GetEnemyTeam(info.Team));
 
-        for (std::vector<int>::iterator it = moves.begin(); it != moves.end(); it++)
+        for (std::vector<int>::iterator it = moves.begin(); it != moves.end();)
         {
+            // Remove enemy king position
+            // TODO Move to new function!!!!!!!!
+            if (*it == enemy_king_idx)
+            {
+                it = moves.erase(it);
+                continue;
+            }
+
             // Create a copy of board and replace old position
             std::array<ChessField, 64> board_copy = board;
 
             board_copy[*it].Piece = board_copy[from_idx].Piece;
             board_copy[from_idx].Piece = ' ';
 
-
-            // Get all enemy positions, preallocate 128 moves to be sure it fits - you never know
+            // Get all enemy positions, preallocate 128 moves to make sure we stay performant
             std::vector<int> enemy_moves = std::vector<int>(128);
 
             for (int i = 0; i < board_copy.size(); i++)
@@ -243,13 +273,20 @@ namespace Move
                 }
             }
 
-            for (const int emove : enemy_moves)
+            bool continueNoIncrement = false;
+            for (const int enemy_move : enemy_moves)
             {
-                if (emove == king_idx)
+                if (enemy_move == king_idx)
                 {
-                    moves.erase(it);
+                    it = moves.erase(it);
+                    continueNoIncrement = true;
                     break;
                 }
+            }
+
+            if (!continueNoIncrement)
+            {
+                it++;
             }
         }
     }
@@ -292,7 +329,7 @@ namespace Move
 
         if (targetCall)
         {
-            EliminateCheckPositions(moves, board, info);
+            EliminateSelfCheckPositions(moves, board, info);
         }
 
         return moves;
