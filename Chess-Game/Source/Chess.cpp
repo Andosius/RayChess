@@ -13,7 +13,6 @@
 
 //======================================
 
-#define RENDER_THROUGH_TEXTURE
 
 Chess::Chess()
     : State(DEFAULT_FEN)
