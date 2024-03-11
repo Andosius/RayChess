@@ -32,17 +32,6 @@ namespace Move
         Vec2 Position;
     };
 
-    static int GetTeamKing(const std::array<ChessField, 64>& board, ChessTeam team)
-    {
-        const auto it = std::find_if(board.begin(), board.end(),
-            [&](const ChessField& element)
-            {
-                return (team == ChessTeam::Black && element.Piece == 'k') || team == ChessTeam::White && element.Piece == 'K';
-            });
-
-        return (int)std::distance(board.begin(), it);
-    }
-
     static ChessTeam GetEnemyTeam(ChessTeam team)
     {
         if (team == ChessTeam::Black)
@@ -230,7 +219,7 @@ namespace Move
     static void EliminateSelfCheckPositions(std::vector<int>& moves, const std::array<ChessField, 64>& board, const MoveInformation& info)
     {
         // Get enemy king position as index
-        int enemy_king_idx = GetTeamKing(board, GetEnemyTeam(info.Team));
+        int enemy_king_idx = Helpers::GetTeamKing(board, GetEnemyTeam(info.Team));
 
         // Iterate over all moves
         for (std::vector<int>::iterator it = moves.begin(); it != moves.end();)

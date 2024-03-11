@@ -4,12 +4,13 @@
 // Local dependencies
 #include "ChessTeam.hpp"
 #include "ChessPieceType.hpp"
+#include "ChessField.hpp"
 
 // External dependencies
 
 
 // Standard Library
-
+#include <array>
 
 //======================================
 
@@ -44,4 +45,12 @@ namespace Helpers
     /// <param name="team">The original pieces team color</param>
     /// <returns>True If piece-team == team</returns>
     bool IsSameTeam(char piece, ChessTeam team);
+
+    /// <summary>
+    /// Returns the position as index of the king in question
+    /// </summary>
+    /// <param name="board">A reference to the board we search the king on</param>
+    /// <param name="team">The team we search the king in</param>
+    /// <returns>int King index</returns>
+    int GetTeamKing(const std::array<ChessField, 64>& board, ChessTeam team);
 }

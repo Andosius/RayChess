@@ -71,4 +71,15 @@ namespace Helpers
     {
         return GetChessPieceColor(piece) == team;
     }
+
+    int GetTeamKing(const std::array<ChessField, 64>& board, ChessTeam team)
+    {
+        const auto it = std::find_if(board.begin(), board.end(),
+            [&](const ChessField& element)
+            {
+                return (team == ChessTeam::Black && element.Piece == 'k') || team == ChessTeam::White && element.Piece == 'K';
+            });
+
+        return (int)std::distance(board.begin(), it);
+    }
 }
