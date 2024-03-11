@@ -226,58 +226,63 @@ namespace Move
         }
     }
 
-    static void EliminateSelfCheckPositions(std::vector<int>& ally_moves, const std::array<ChessField, 64>& board, const MoveInformation& info)
+    // Special thanks to Edgar (breadfish.de) for helping me find the reason for a lot of problems caused by std::remove
+    static void EliminateSelfCheckPositions(std::vector<int>& moves, const std::array<ChessField, 64>& board, const MoveInformation& info)
     {
-        std::set<int> remove_moves = std::set<int>();
+        // Get enemy king position as index
         int enemy_king_idx = GetTeamKing(board, GetEnemyTeam(info.Team));
 
-        // Create a board for every move and simulate it
-        for (const int move_location : ally_moves)
+        // Iterate over all moves
+        for (std::vector<int>::iterator it = moves.begin(); it != moves.end();)
         {
-            // Prevent capturing enemy king
-            if (move_location == enemy_king_idx)
+            // Delete moves that would take enemy king
+            if (*it == enemy_king_idx)
             {
-                remove_moves.insert(move_location);
+                it = moves.erase(it);
                 continue;
             }
 
-            // Copy the board
+            // Copy the chess board to simulate moves in GetMovementPositions
             std::array<ChessField, 64> boardCopy = board;
 
-            // Replace data - simulate move
-            boardCopy[move_location].Piece = boardCopy[info.Position.ToInt()].Piece; // old location is new location
+            // Replace data - simulate the move
+            boardCopy[*it].Piece = boardCopy[info.Position.ToInt()].Piece; // old location is new location
             boardCopy[info.Position.ToInt()].Piece = ' '; // old location is empty
 
-            // Get our own king so we can prevent moves that would expose him to an enemy
-            int king_idx = GetTeamKing(boardCopy, info.Team);
 
-            // Collect all enemy moves
+            // Get our king - he may be the piece moving so we make sure to get him dynamically
+            int ally_king_idx = GetTeamKing(boardCopy, info.Team);
+
+            // Create a unique set of all enemy moves
             std::set<int> enemy_moves = std::set<int>();
 
-            // for every board field (0 - 63), collect moves and add them to enemy_moves
-            for (int enemy_idx = 0; enemy_idx < boardCopy.size(); enemy_idx++)
+            // Get enemy team to make it easier to read
+            ChessTeam enemy_team = GetEnemyTeam(info.Team);
+
+            // Go through all pieces and get enemy team information
+            for (int i = 0; i < boardCopy.size(); i++)
             {
-                ChessField& field = boardCopy[enemy_idx];
-                if (Helpers::IsChessPiece(field.Piece) && !Helpers::IsSameTeam(field.Piece, info.Team))
+                char piece = boardCopy[i].Piece;
+                if (Helpers::IsChessPiece(piece) && Helpers::IsSameTeam(piece, enemy_team))
                 {
-                    std::vector<int> tmp_enemy_moves = Move::GetMovementPositions(boardCopy, enemy_idx, false);
+                    std::vector<int> tmp_enemy_moves = Move::GetMovementPositions(boardCopy, i, false);
                     enemy_moves.insert(std::make_move_iterator(tmp_enemy_moves.begin()), std::make_move_iterator(tmp_enemy_moves.end()));
                 }
             }
 
-            // Remove every move where: enemy_pos can be king_idx
-            std::set<int>::iterator it = std::find(enemy_moves.begin(), enemy_moves.end(), king_idx);
+            // Check if our kings position is in enemy_moves
+            std::set<int>::iterator find_it = std::find(enemy_moves.begin(), enemy_moves.end(), ally_king_idx);
 
-            // Enemy could attack King - invalidate move
-            if (it != enemy_moves.end())
+            // Enemy could attack King -> invalidate move by removing it!
+            if (find_it != enemy_moves.end())
             {
-                remove_moves.insert(move_location);
+                it = moves.erase(it);
+                continue;
             }
-        }
 
-        for (int to_remove : remove_moves)
-        {
-            std::remove(ally_moves.begin(), ally_moves.end(), to_remove);
+            // Everything fine, we increment our iterator
+            it++;
+
         }
     }
 
