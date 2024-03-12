@@ -58,3 +58,5 @@ private:
     std::vector<int> m_SelectedPositions;
     std::vector<int> m_PossibleMoves;
 };
+
+extern Chess* g_Chess;

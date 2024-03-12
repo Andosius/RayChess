@@ -8,7 +8,7 @@
 
 
 // Standard Library
-
+#include <cmath>
 
 //======================================
 
@@ -34,6 +34,20 @@ struct Vec2
     }
 
     ~Vec2() = default;
+
+    /// <summary>
+    /// Gets the distance between two vectors.
+    /// </summary>
+    /// <param name="first">First vector</param>
+    /// <param name="second">Second vector</param>
+    /// <returns>int The distance between them</returns>
+    static int GetDistance(const Vec2 first, const Vec2 second)
+    {
+        int deltaX = second.X - first.X;
+        int deltaY = second.Y - first.Y;
+
+        return static_cast<int>(std::sqrt((deltaX * deltaX) + (deltaY * deltaY)));
+    }
 
     /// <summary>
     /// Checks for valid chess board positions.

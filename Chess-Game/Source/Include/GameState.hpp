@@ -32,6 +32,7 @@ struct GameState
     bool BlackCastlingQueen = false;
 
     Vec2 EnPassant = Vec2(-1, -1);
+    Vec2 EnPassantTarget = Vec2(-1, -1);
 
     int HalfMoveCounter = 0;
     int FullMoveEnumerator = 0;

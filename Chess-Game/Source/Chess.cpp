@@ -14,6 +14,9 @@
 //======================================
 
 
+Chess* g_Chess;
+
+
 Chess::Chess()
     : State(DEFAULT_FEN)
 {
@@ -44,6 +47,8 @@ Chess::Chess()
 
         m_IsMoving = false;
     }
+
+    g_Chess = this;
 
     GameStateToBoard();
 }
@@ -236,21 +241,6 @@ void Chess::OnPlayerReleaseLeftClickBoard(Vec2 position, bool isPossibleMove)
     {
         if (m_IsMoving && new_pos_idx != m_TargetPiece && m_TargetPiece != INVALID_TARGET_PIECE && Helpers::IsSameTeam(Board[m_TargetPiece].Piece, State.Turn))
         {
-            Board[new_pos_idx].Piece = Board[m_TargetPiece].Piece;
-            State.FenPieceMap[new_pos_idx] = Board[m_TargetPiece].Piece;
-
-            Board[m_TargetPiece].Piece = ' ';
-            State.FenPieceMap[m_TargetPiece] = ' ';
-
-            if (State.Turn == ChessTeam::White)
-            {
-                State.Turn = ChessTeam::Black;
-            }
-            else
-            {
-                State.Turn = ChessTeam::White;
-            }
-
             OnMoveHappened(Vec2(m_TargetPiece), Vec2(position));
             GameStateToBoard();
         }
@@ -278,7 +268,55 @@ void Chess::OnPlayerRightClickBoard(Vec2 position)
 
 void Chess::OnMoveHappened(Vec2 from, Vec2 to)
 {
-    // To Do: EnPassant & ChessMovement.cpp!!
+    int new_pos_idx = to.ToInt();
+    ChessTeam team = Helpers::GetChessPieceColor(Board[m_TargetPiece].Piece);
+
+    // Update Board and FEN data
+    Board[new_pos_idx].Piece = Board[m_TargetPiece].Piece;
+    State.FenPieceMap[new_pos_idx] = Board[m_TargetPiece].Piece;
+
+    Board[m_TargetPiece].Piece = ' ';
+    State.FenPieceMap[m_TargetPiece] = ' ';
+
+    if (State.Turn == ChessTeam::White)
+    {
+        State.Turn = ChessTeam::Black;
+    }
+    else
+    {
+        State.Turn = ChessTeam::White;
+    }
+
+
+    // START ENPASSANT LOGIC
+    if (State.EnPassant.IsValidPosition())
+    {
+        if (to == State.EnPassant)
+        {
+            int enpassant_idx = State.EnPassantTarget.ToInt();
+
+            Board[enpassant_idx].Piece = ' ';
+            State.FenPieceMap[enpassant_idx] = ' ';
+        }
+
+        State.EnPassant = Vec2(-1, -1);
+        State.EnPassantTarget = Vec2(-1, -1);
+    }
+
+    // Two forward => EnPassant
+    if (Helpers::GetChessPieceType(Board[new_pos_idx].Piece) == ChessPieceType::Pawn && Vec2::GetDistance(from, to) == 2)
+    {
+        // Negate Y because we want to go 1 backwards
+        Vec2 direction = (team == ChessTeam::Black) ? Vec2(1, 1) : Vec2(1, -1);
+        direction.Y *= -1;
+
+        // Set EnPassant Vec2 for now, implement it later
+        State.EnPassant = to + (Vec2(0, 1) * direction);
+        State.EnPassantTarget = to;
+    }
+    // END ENPASSANT LOGIC
+
+
     // To Do: Pawn Conversion to something else!!!
     /*printf("Moved piece from (%d|%d) to (%d|%d)!\n", from.X, from.Y, to.X, to.Y);*/
 }

@@ -2,6 +2,7 @@
 
 
 // Local dependencies
+#include "Chess.hpp"
 #include "ChessMovement.hpp"
 #include "Vector2.hpp"
 #include "ChessHelpers.hpp"
@@ -98,7 +99,8 @@ namespace Move
             Vec2 test_pos = info.Position + (take * direction);
             int test_idx = test_pos.ToInt();
 
-            if (test_pos.IsValidPosition() && Helpers::IsChessPiece(board[test_idx].Piece) && !Helpers::IsSameTeam(board[test_idx].Piece, info.Team))
+            // Check for valid position, (if its a chess piece AND enemy team) OR if its enpassant and not a chess piece (this check is not needed but I'd rather be sure :))
+            if (test_pos.IsValidPosition() && ((Helpers::IsChessPiece(board[test_idx].Piece) && !Helpers::IsSameTeam(board[test_idx].Piece, info.Team)) || (test_pos == g_Chess->State.EnPassant && !Helpers::IsChessPiece(board[test_idx].Piece))))
             {
                 moves.push_back(test_idx);
             }
