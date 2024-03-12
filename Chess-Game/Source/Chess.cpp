@@ -288,35 +288,39 @@ void Chess::OnMoveHappened(Vec2 from, Vec2 to)
     }
 
 
-    // START ENPASSANT LOGIC
-    if (State.EnPassant.IsValidPosition())
+    if (Helpers::GetChessPieceType(Board[new_pos_idx].Piece) == ChessPieceType::Pawn)
     {
-        if (to == State.EnPassant)
+        if (State.EnPassant.IsValidPosition())
         {
-            int enpassant_idx = State.EnPassantTarget.ToInt();
+            if (State.EnPassant == to)
+            {
+                int enpassant_idx = State.EnPassantTarget.ToInt();
 
-            Board[enpassant_idx].Piece = ' ';
-            State.FenPieceMap[enpassant_idx] = ' ';
+                Board[enpassant_idx].Piece = ' ';
+                State.FenPieceMap[enpassant_idx] = ' ';
+            }
+
+            State.EnPassant = Vec2(-1, -1);
+            State.EnPassantTarget = Vec2(-1, -1);
         }
 
-        State.EnPassant = Vec2(-1, -1);
-        State.EnPassantTarget = Vec2(-1, -1);
+        // Add EnPassant behind pawn
+        if (Vec2::GetDistance(from, to) == 2)
+        {
+            // Negate Y because we want to go 1 backwards
+            Vec2 direction = (team == ChessTeam::Black) ? Vec2(1, 1) : Vec2(1, -1);
+            direction.Y *= -1;
+
+            // Set EnPassant Vec2 for now, implement it later
+            State.EnPassant = to + (Vec2(0, 1) * direction);
+            State.EnPassantTarget = to;
+        }
+
+        // To Do: Pawn Promotion!!!
     }
 
-    // Two forward => EnPassant
-    if (Helpers::GetChessPieceType(Board[new_pos_idx].Piece) == ChessPieceType::Pawn && Vec2::GetDistance(from, to) == 2)
-    {
-        // Negate Y because we want to go 1 backwards
-        Vec2 direction = (team == ChessTeam::Black) ? Vec2(1, 1) : Vec2(1, -1);
-        direction.Y *= -1;
-
-        // Set EnPassant Vec2 for now, implement it later
-        State.EnPassant = to + (Vec2(0, 1) * direction);
-        State.EnPassantTarget = to;
-    }
-    // END ENPASSANT LOGIC
-
-
-    // To Do: Pawn Conversion to something else!!!
-    /*printf("Moved piece from (%d|%d) to (%d|%d)!\n", from.X, from.Y, to.X, to.Y);*/
+    
+#ifdef DEBUG
+    printf("Moved piece from (%d|%d) to (%d|%d)!\n", from.X, from.Y, to.X, to.Y);
+#endif
 }
