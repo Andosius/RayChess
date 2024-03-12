@@ -240,7 +240,7 @@ namespace Move
 
 
             // Get our king - he may be the piece moving so we make sure to get him dynamically
-            int ally_king_idx = GetTeamKing(boardCopy, info.Team);
+            int ally_king_idx = Helpers::GetTeamKing(boardCopy, info.Team);
 
             // Create a unique set of all enemy moves
             std::set<int> enemy_moves = std::set<int>();
