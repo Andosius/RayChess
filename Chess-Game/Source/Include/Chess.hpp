@@ -32,11 +32,14 @@ private:
     void GameStateToBoard();
     void GenerateBoardTexture();
 
-    void OnPlayerLeftClickBoard(Vec2 position, bool isChessPiece);
-    void OnPlayerReleaseLeftClickBoard(Vec2 position, bool isPossibleMove);
-    void OnPlayerRightClickBoard(Vec2 position);
+    void OnPlayerLeftClickBoard(const Vec2& position, bool isChessPiece);
+    void OnPlayerReleaseLeftClickBoard(const Vec2& position, bool isPossibleMove);
+    void OnPlayerRightClickBoard(const Vec2& position);
 
-    void OnMoveHappened(Vec2 from, Vec2 to);
+    void OnMoveHappened(const Vec2& from, const Vec2& to);
+
+    void UpdateGameInformation(const Vec2& from, const Vec2& to);
+    void HandleSpecialPawnInteractions(const Vec2& from, const Vec2& to);
 
 public:
     GameState State;

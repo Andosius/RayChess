@@ -207,7 +207,7 @@ void Chess::HandleInput()
     }
 }
 
-void Chess::OnPlayerLeftClickBoard(Vec2 position, bool isChessPiece)
+void Chess::OnPlayerLeftClickBoard(const Vec2& position, bool isChessPiece)
 {
     if (isChessPiece)
     {
@@ -233,7 +233,7 @@ void Chess::OnPlayerLeftClickBoard(Vec2 position, bool isChessPiece)
     }
 }
 
-void Chess::OnPlayerReleaseLeftClickBoard(Vec2 position, bool isPossibleMove)
+void Chess::OnPlayerReleaseLeftClickBoard(const Vec2& position, bool isPossibleMove)
 {
     int new_pos_idx = position.ToInt();
 
@@ -251,7 +251,7 @@ void Chess::OnPlayerReleaseLeftClickBoard(Vec2 position, bool isPossibleMove)
     }
 }
 
-void Chess::OnPlayerRightClickBoard(Vec2 position)
+void Chess::OnPlayerRightClickBoard(const Vec2& position)
 {
     std::vector<int>::iterator it = std::find(m_SelectedPositions.begin(), m_SelectedPositions.end(), position.ToInt());
     if (it == m_SelectedPositions.end())
@@ -266,10 +266,34 @@ void Chess::OnPlayerRightClickBoard(Vec2 position)
     GameStateToBoard();
 }
 
-void Chess::OnMoveHappened(Vec2 from, Vec2 to)
+void Chess::OnMoveHappened(const Vec2& from, const Vec2& to)
 {
     int new_pos_idx = to.ToInt();
-    ChessTeam team = Helpers::GetChessPieceColor(Board[m_TargetPiece].Piece);
+    UpdateGameInformation(from, to);
+
+    if (Helpers::GetChessPieceType(Board[to.ToInt()].Piece) == ChessPieceType::Pawn)
+    {
+        HandleSpecialPawnInteractions(from, to);
+    }
+
+    // TODO:
+    // 
+    // Castling
+    // HandleSpecialKingInteractions(from, to);
+    // Game end => total moves = 0, king_idx inside moves via it
+    //
+    // Save FEN after everything is proccessed
+    // FEN can be loaded by calling State = GameState(std::string containing FEN)
+    // Saved by State.Export();
+    
+#ifdef DEBUG
+    printf("Moved piece from (%d|%d) to (%d|%d)!\n", from.X, from.Y, to.X, to.Y);
+#endif
+}
+
+void Chess::UpdateGameInformation(const Vec2& from, const Vec2& to)
+{
+    int new_pos_idx = to.ToInt();
 
     // Update Board and FEN data
     Board[new_pos_idx].Piece = Board[m_TargetPiece].Piece;
@@ -286,41 +310,43 @@ void Chess::OnMoveHappened(Vec2 from, Vec2 to)
     {
         State.Turn = ChessTeam::White;
     }
+}
 
-
-    if (Helpers::GetChessPieceType(Board[new_pos_idx].Piece) == ChessPieceType::Pawn)
+void Chess::HandleSpecialPawnInteractions(const Vec2& from, const Vec2& to)
+{
+    if (State.EnPassant.IsValidPosition())
     {
-        if (State.EnPassant.IsValidPosition())
+        // Second check just in case we get some random behavior
+        if (State.EnPassant == to && to.X != from.X)
         {
-            if (State.EnPassant == to)
-            {
-                int enpassant_idx = State.EnPassantTarget.ToInt();
+            int enpassant_idx = State.EnPassantTarget.ToInt();
 
-                Board[enpassant_idx].Piece = ' ';
-                State.FenPieceMap[enpassant_idx] = ' ';
-            }
-
-            State.EnPassant = Vec2(-1, -1);
-            State.EnPassantTarget = Vec2(-1, -1);
+            Board[enpassant_idx].Piece = ' ';
+            State.FenPieceMap[enpassant_idx] = ' ';
         }
 
-        // Add EnPassant behind pawn
-        if (Vec2::GetDistance(from, to) == 2)
-        {
-            // Negate Y because we want to go 1 backwards
-            Vec2 direction = (team == ChessTeam::Black) ? Vec2(1, 1) : Vec2(1, -1);
-            direction.Y *= -1;
-
-            // Set EnPassant Vec2 for now, implement it later
-            State.EnPassant = to + (Vec2(0, 1) * direction);
-            State.EnPassantTarget = to;
-        }
-
-        // To Do: Pawn Promotion!!!
+        State.EnPassant = Vec2(-1, -1);
+        State.EnPassantTarget = Vec2(-1, -1);
     }
 
-    
+    // Add EnPassant behind pawn
+    if (Vec2::GetDistance(from, to) == 2)
+    {
+        ChessTeam team = Helpers::GetChessPieceColor(Board[m_TargetPiece].Piece);
+
+        // Negate Y because we want to go 1 backwards
+        Vec2 direction = (team == ChessTeam::Black) ? Vec2(1, -1) : Vec2(1, 1);
+        direction.Y *= -1;
+
+        // Set EnPassant Vec2 for now, implement it later
+        State.EnPassant = to + (Vec2(0, 1) * direction);
+        State.EnPassantTarget = to;
+
+        // TODO:
+        // Possible promotion!!
+
 #ifdef DEBUG
-    printf("Moved piece from (%d|%d) to (%d|%d)!\n", from.X, from.Y, to.X, to.Y);
+        printf("EnPassant is now at (%d|%d)!\n", State.EnPassant.X, State.EnPassant.Y);
 #endif
+    }
 }
