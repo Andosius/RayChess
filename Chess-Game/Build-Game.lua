@@ -21,8 +21,6 @@ project "Game"
     include_raylib()
     link_raylib()
 
-    postbuildcommands { "{COPYDIR} %[../Resources/] %[%{!cfg.targetdir}]" }
-
     -- Project settings
     filter {"action:vs*", "configurations:Release"}
         kind "WindowedApp"
@@ -33,6 +31,7 @@ project "Game"
 
     filter "configurations:Release"
         defines { "NDEBUG" }
+
 
     vpaths
     {

@@ -1,6 +1,24 @@
 // Local dependencies
 #include "Textures.hpp"
 
+#include "Images/BlackKing.hpp"
+#include "Images/WhiteKing.hpp"
+
+#include "Images/BlackQueen.hpp"
+#include "Images/WhiteQueen.hpp"
+
+#include "Images/BlackRook.hpp"
+#include "Images/WhiteRook.hpp"
+
+#include "Images/BlackBishop.hpp"
+#include "Images/WhiteBishop.hpp"
+
+#include "Images/BlackKnight.hpp"
+#include "Images/WhiteKnight.hpp"
+
+#include "Images/BlackPawn.hpp"
+#include "Images/WhitePawn.hpp"
+
 // External dependencies
 
 
@@ -19,18 +37,15 @@ std::array<Image, 12> g_Images = std::array<Image, 12>();
 namespace Textures
 {
     /// <summary>
-    /// Loads an image into the GPU buffer.
+    /// Loads an images into the GPU buffer by reading a hex dump.
     /// </summary>
-    /// <param name="filename">The files relative path from the executable</param>
-    static void LoadChessTexture(const char* filename)
+    /// <param name="data">The hex dump data</param>
+    /// <param name="size">The array size</param>
+    static void LoadChessTextureFromMemory(const unsigned char* data, int size)
     {
         static int counter = 0;
-        static fs::path base_path = fs::current_path();
 
-        fs::path file_path = base_path / filename;
-
-
-        Image img = LoadImage(file_path.string().c_str());
+        Image img = LoadImageFromMemory(".png", data, size);
         g_Textures[counter++] = LoadTextureFromImage(img);
 
         UnloadImage(img);
@@ -39,28 +54,28 @@ namespace Textures
     void LoadChessPieces()
     {
         // King
-        LoadChessTexture("Assets/Images/Chess_tile_kd.png");
-        LoadChessTexture("Assets/Images/Chess_tile_kl.png");
+        LoadChessTextureFromMemory(BlackKingData, 4562);
+        LoadChessTextureFromMemory(WhiteKingData, 5083);
 
         // Queen
-        LoadChessTexture("Assets/Images/Chess_tile_qd.png");
-        LoadChessTexture("Assets/Images/Chess_tile_ql.png");
+        LoadChessTextureFromMemory(BlackQueenData, 4176);
+        LoadChessTextureFromMemory(WhiteQueenData, 7039);
 
         // Rook
-        LoadChessTexture("Assets/Images/Chess_tile_rd.png");
-        LoadChessTexture("Assets/Images/Chess_tile_rl.png");
+        LoadChessTextureFromMemory(BlackRookData, 2465);
+        LoadChessTextureFromMemory(WhiteRookData, 2817);
 
         // Bishop
-        LoadChessTexture("Assets/Images/Chess_tile_bd.png");
-        LoadChessTexture("Assets/Images/Chess_tile_bl.png");
+        LoadChessTextureFromMemory(BlackBishopData, 3475);
+        LoadChessTextureFromMemory(WhiteBishopData, 4370);
 
         // Knight
-        LoadChessTexture("Assets/Images/Chess_tile_nd.png");
-        LoadChessTexture("Assets/Images/Chess_tile_nl.png");
+        LoadChessTextureFromMemory(BlackKnightData, 4203);
+        LoadChessTextureFromMemory(WhiteKnightData, 4416);
 
         // Pawn
-        LoadChessTexture("Assets/Images/Chess_tile_pd.png");
-        LoadChessTexture("Assets/Images/Chess_tile_pl.png");
+        LoadChessTextureFromMemory(BlackPawnData, 2457);
+        LoadChessTextureFromMemory(WhitePawnData, 3323);
     }
 
     void UnloadChessPieces()
