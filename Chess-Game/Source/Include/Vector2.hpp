@@ -77,9 +77,24 @@ struct Vec2
     {
         Vec2 result;
 
-        result.X = other.X + X;
-        result.Y = other.Y + Y ;
+        result.X = X + other.X;
+        result.Y = Y + other.Y;
 
+        return result;
+    }
+
+    /// <summary>
+    /// Subtracts a Vec2 from another
+    /// </summary>
+    /// <param name="other">The other Vec2 we want to subtract to a result</param>
+    /// <returns>Vec2 The result</returns>
+    Vec2 operator-(const Vec2 other) const
+    {
+        Vec2 result;
+
+        result.X = X - other.X;
+        result.Y = Y - other.Y;
+    
         return result;
     }
 
