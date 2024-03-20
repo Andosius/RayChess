@@ -26,6 +26,11 @@ Chess::Chess()
     Textures::LoadChessPieces();
 
     {
+        for (size_t i = 0; i < 64; i++)
+        {
+            Board[i] = ChessField();
+        }
+
         m_SelectedPositions = std::vector<int>();
         m_BoardTexture = Texture2D{};
 
@@ -75,7 +80,9 @@ void Chess::GameStateToBoard()
             drawColor = !drawColor;
         }
 
-        Board[i] = ChessField(drawColor ? m_ColorBlack : m_ColorWhite, State.FenPieceMap[i]);
+        Board[i].AddSpecialColor(drawColor ? m_ColorBlack : m_ColorWhite);
+        Board[i].Piece = State.FenPieceMap[i];
+
         drawColor = !drawColor;
     }
 
@@ -162,6 +169,15 @@ void Chess::DrawChessBoard()
             {
                 DrawTexture(g_Textures[Textures::GetChessPieceTextureIndex(Board[i].Piece)], column * FIELD_WIDTH + PIECE_OFFSET, row * FIELD_HEIGHT + PIECE_OFFSET, WHITE);
             }
+
+#ifdef DEBUG
+            // Write locations
+            char data[6] = {
+                '(', column + 48, '|', row + 48, ')', '\0'
+            };
+
+            DrawText(data, column * FIELD_WIDTH, row * FIELD_HEIGHT, 14, BLACK);
+#endif
         }
     }
 
@@ -334,19 +350,19 @@ void Chess::HandleSpecialPawnInteractions(const Vec2& from, const Vec2& to)
     {
         ChessTeam team = Helpers::GetChessPieceColor(Board[m_TargetPiece].Piece);
 
-        // Negate Y because we want to go 1 backwards
-        Vec2 direction = (team == ChessTeam::Black) ? Vec2(1, -1) : Vec2(1, 1);
-        direction.Y *= -1;
+        // Get the difference between to and from and take the half of Y as X must be 0!
+        Vec2 delta = (to - from);
+        delta.Y /= 2;
 
-        // Set EnPassant Vec2 for now, implement it later
-        State.EnPassant = to + (Vec2(0, 1) * direction);
+        // Set EnPassant to our from-position and add delta to it.
+        State.EnPassant = from + delta;
         State.EnPassantTarget = to;
+    }
 
-        // TODO:
-        // Possible promotion!!
+    // TODO:
+    // Possible promotion!!
 
 #ifdef DEBUG
-        printf("EnPassant is now at (%d|%d)!\n", State.EnPassant.X, State.EnPassant.Y);
+    printf("EnPassant is now at (%d|%d)!\n", State.EnPassant.X, State.EnPassant.Y);
 #endif
-    }
 }
